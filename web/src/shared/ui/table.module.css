@@ -26,7 +26,7 @@
 .table td[data-num],
 .table th[data-num] {
   text-align: right;
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums proportional-nums;
   white-space: nowrap;
 }
 
@@ -39,4 +39,9 @@
   display: block;
   color: var(--ink-muted);
   font-weight: var(--weight-regular);
+}
+
+.table td:first-child,
+.table th:first-child {
+  min-width: 12rem;
 }
