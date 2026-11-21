@@ -1,0 +1,61 @@
+# How each design computes and caches features. Read by src/dfp/sim/designs.py and the service.
+latency_budget_ms: 1500
+provider_timeout_ms: 1200
+retry_once: true
+tiles:
+  hour_tile_minutes: 60
+  retention_minutes: 10140        # longest window + one hour
+idempotency_ttl_hours: 48
+l1: {capacity: 2000, max_ttl_s: 300}
+redis: {capacity_keys: 5000}
+breaker: {failures_to_open: 5, cooldown_s: 30}
+designs:
+  direct:
+    label: "Query the source every time (status quo)"
+    stream: aurora
+    cache: none
+  ttl_cache:
+    label: "One Redis cache, 24 h TTL for every provider"
+    stream: aurora
+    cache: redis_only
+    single_ttl_hours: 24
+    key_by_tenant: false
+  streaming_naive:
+    label: "Stream counters by arrival time, no dedupe, one TTL"
+    stream: stream
+    time_basis: arrival
+    dedupe: false
+    cache: redis_only
+    single_ttl_hours: 24
+    key_by_tenant: false
+  platform:
+    label: "This platform"
+    stream: stream
+    time_basis: event
+    dedupe: true
+    cache: tiered
+    key_by_tenant: true
+    coalesce: true
+    breaker: true
+    stale_if_error: true
+  no_dedupe:
+    label: "Platform without event dedupe"
+    base: platform
+    dedupe: false
+  no_coalescing:
+    label: "Platform without request coalescing"
+    base: platform
+    coalesce: false
+  no_dynamo_tier:
+    label: "Platform without the DynamoDB tier (Redis evicts)"
+    base: platform
+    cache: l1_redis
+  single_ttl:
+    label: "Platform with one 24 h TTL instead of per-provider rules"
+    base: platform
+    single_ttl_hours: 24
+  no_breaker:
+    label: "Platform without circuit breaker and stale-if-error"
+    base: platform
+    breaker: false
+    stale_if_error: false

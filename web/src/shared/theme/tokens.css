@@ -1,0 +1,54 @@
+/* Theme constants. Components use these names, never raw values. */
+:root {
+  --paper: #f2f5f8;
+  --surface: #ffffff;
+  --ink: #14202b;
+  --ink-muted: #56626e;
+  --rule: #d9e0e6;
+  --rule-strong: #b7c1ca;
+
+  /* data colours: categorical slots of the validated chart palette, in fixed order */
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-4: #eda100;
+  --series-5: #e87ba4;
+  --series-6: #008300;
+  --series-7: #6250d6;
+  --platform: var(--series-1);
+  --claim: #eb6834; /* breaks a rule or miscounts */
+  --track: #e4e9ee;
+
+  --font: "Schibsted Grotesk Variable", system-ui, sans-serif;
+  --size-0: 0.8125rem;
+  --size-1: 0.9375rem;
+  --size-2: 1.125rem;
+  --size-3: 1.5rem;
+  --size-4: 2.375rem;
+  --leading: 1.5;
+  --leading-tight: 1.12;
+  --weight-regular: 420;
+  --weight-medium: 560;
+  --weight-bold: 680;
+  --tracking-display: -0.022em;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2.25rem;
+  --space-7: 3.5rem;
+  --space-8: 5rem;
+
+  --measure: 68ch;
+  --page: 70rem;
+  --radius: 4px;
+  --hairline: 1px;
+  --gap-mark: 2px;
+  --bar-h: 1.375rem;
+  --track-h: 0.875rem;
+  --label-col: 15rem;
+  --value-col: 8.5rem;
+  --shimmer: 1.4s;
+}

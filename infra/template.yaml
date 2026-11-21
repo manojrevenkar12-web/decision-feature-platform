@@ -1,0 +1,187 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  decision-feature-platform: Kinesis-fed stream features in DynamoDB, a feature API on Lambda with
+  L1/Redis/DynamoDB caching of paid provider calls, and the feature registry on Aurora PostgreSQL.
+
+Parameters:
+  VpcSubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+  VpcSecurityGroupId:
+    Type: AWS::EC2::SecurityGroup::Id
+  ProviderGatewayUrl:
+    Type: String
+  ProviderApiKeySecretArn:
+    Type: String
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Architectures: [arm64]
+    MemorySize: 1024
+    Timeout: 10
+    Tracing: Active
+    VpcConfig:
+      SubnetIds: !Ref VpcSubnetIds
+      SecurityGroupIds: [!Ref VpcSecurityGroupId]
+    Environment:
+      Variables:
+        BUCKETS_TABLE: !Ref Buckets
+        IDEMPOTENCY_TABLE: !Ref Idempotency
+        CACHE_TABLE: !Ref ProviderCache
+        REDIS_URL: !Sub "rediss://${Redis.Endpoint.Address}:${Redis.Endpoint.Port}"
+        POWERTOOLS_SERVICE_NAME: decision-feature-platform
+
+Resources:
+  Events:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      StreamModeDetails: {StreamMode: ON_DEMAND}
+      RetentionPeriodHours: 168
+      StreamEncryption: {EncryptionType: KMS, KeyId: alias/aws/kinesis}
+
+  StreamFailures:
+    Type: AWS::SQS::Queue
+    Properties:
+      MessageRetentionPeriod: 1209600
+      SqsManagedSseEnabled: true
+
+  StreamConsumer:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../src
+      Handler: dfp.api.lambda_handler.stream_handler
+      Policies:
+        - DynamoDBCrudPolicy: {TableName: !Ref Buckets}
+        - DynamoDBCrudPolicy: {TableName: !Ref Idempotency}
+        - SQSSendMessagePolicy: {QueueName: !GetAtt StreamFailures.QueueName}
+      Events:
+        Txns:
+          Type: Kinesis
+          Properties:
+            Stream: !GetAtt Events.Arn
+            StartingPosition: TRIM_HORIZON
+            BatchSize: 500
+            MaximumBatchingWindowInSeconds: 1
+            ParallelizationFactor: 4
+            BisectBatchOnFunctionError: true
+            MaximumRetryAttempts: 10
+            FunctionResponseTypes: [ReportBatchItemFailures]
+            DestinationConfig:
+              OnFailure:
+                Destination: !GetAtt StreamFailures.Arn
+
+  FeatureApi:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../src
+      Handler: dfp.api.lambda_handler.api_handler
+      ProvisionedConcurrencyConfig:
+        ProvisionedConcurrentExecutions: 4
+      AutoPublishAlias: live
+      Environment:
+        Variables:
+          PROVIDER_GATEWAY_URL: !Ref ProviderGatewayUrl
+          PROVIDER_API_KEY: !Sub "{{resolve:secretsmanager:${ProviderApiKeySecretArn}}}"
+          REGISTRY_URL: !Sub "postgresql+psycopg://dfp@${Registry.Endpoint.Address}:5432/features"
+      Policies:
+        - DynamoDBReadPolicy: {TableName: !Ref Buckets}
+        - DynamoDBCrudPolicy: {TableName: !Ref ProviderCache}
+      Events:
+        Http:
+          Type: HttpApi
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+
+  Buckets:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - {AttributeName: pk, AttributeType: S}
+        - {AttributeName: sk, AttributeType: S}
+      KeySchema:
+        - {AttributeName: pk, KeyType: HASH}
+        - {AttributeName: sk, KeyType: RANGE}
+      TimeToLiveSpecification: {AttributeName: expires_at, Enabled: true}
+      PointInTimeRecoverySpecification: {PointInTimeRecoveryEnabled: true}
+      SSESpecification: {SSEEnabled: true}
+
+  Idempotency:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - {AttributeName: event_id, AttributeType: S}
+      KeySchema:
+        - {AttributeName: event_id, KeyType: HASH}
+      TimeToLiveSpecification: {AttributeName: expires_at, Enabled: true}
+      SSESpecification: {SSEEnabled: true}
+
+  ProviderCache:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - {AttributeName: key, AttributeType: S}
+      KeySchema:
+        - {AttributeName: key, KeyType: HASH}
+      TimeToLiveSpecification: {AttributeName: expires_at, Enabled: true}
+      SSESpecification: {SSEEnabled: true}
+
+  Redis:
+    Type: AWS::ElastiCache::ServerlessCache
+    Properties:
+      ServerlessCacheName: dfp-provider-cache
+      Engine: valkey
+      SecurityGroupIds: [!Ref VpcSecurityGroupId]
+      SubnetIds: !Ref VpcSubnetIds
+
+  RegistrySubnets:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: feature registry
+      SubnetIds: !Ref VpcSubnetIds
+
+  Registry:
+    Type: AWS::RDS::DBCluster
+    DeletionPolicy: Snapshot
+    UpdateReplacePolicy: Snapshot
+    Properties:
+      Engine: aurora-postgresql
+      EngineVersion: "16.8"
+      DatabaseName: features
+      MasterUsername: dfp_admin
+      ManageMasterUserPassword: true
+      EnableIAMDatabaseAuthentication: true
+      StorageEncrypted: true
+      DBSubnetGroupName: !Ref RegistrySubnets
+      VpcSecurityGroupIds: [!Ref VpcSecurityGroupId]
+      ServerlessV2ScalingConfiguration: {MinCapacity: 0.5, MaxCapacity: 8}
+
+  RegistryWriter:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBClusterIdentifier: !Ref Registry
+      DBInstanceClass: db.serverless
+      Engine: aurora-postgresql
+
+  StreamAgeAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Stream features fall behind the decisions that read them
+      Namespace: AWS/Lambda
+      MetricName: IteratorAge
+      Dimensions: [{Name: FunctionName, Value: !Ref StreamConsumer}]
+      Statistic: Maximum
+      Period: 60
+      EvaluationPeriods: 3
+      Threshold: 30000
+      ComparisonOperator: GreaterThanThreshold
+
+Outputs:
+  ApiUrl:
+    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+  StreamName:
+    Value: !Ref Events

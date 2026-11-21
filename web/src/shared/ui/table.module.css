@@ -1,0 +1,42 @@
+.wrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--size-0);
+}
+
+.table th {
+  text-align: left;
+  font-weight: var(--weight-medium);
+  color: var(--ink-muted);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: var(--hairline) solid var(--rule-strong);
+  vertical-align: bottom;
+}
+
+.table td {
+  padding: var(--space-3);
+  border-bottom: var(--hairline) solid var(--rule);
+  vertical-align: top;
+}
+
+.table td[data-num],
+.table th[data-num] {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.table tr[data-current] td {
+  background: var(--surface);
+  font-weight: var(--weight-medium);
+}
+
+.sub {
+  display: block;
+  color: var(--ink-muted);
+  font-weight: var(--weight-regular);
+}

@@ -1,0 +1,56 @@
+# The simulated lenders' world. Read only by src/dfp/sim/world.py; never by the platform.
+days: 14
+start: "2026-03-02T00:00:00Z"
+tenants: 6
+customers_per_tenant: 500
+shared_person_share: 0.12        # people who are customers of two lenders (same bureau file)
+business_share: 0.3              # customers that are businesses (KYB applies)
+
+transactions:
+  mean_per_day: 8
+  heterogeneity_shape: 0.8       # gamma shape for per-customer rate
+  merchants: 4000
+  merchant_zipf: 1.3
+  amount_log_mean: 3.4           # euros
+  amount_log_sd: 1.1
+  decline_rate: 0.04
+  burst_share: 0.06              # customers with a takeover-like burst before a decision
+  burst_events: [15, 40]
+  burst_minutes: 12
+  burst_decline_rate: 0.35
+
+arrival:                          # event time -> arrival at the stream
+  fast: {share: 0.90, median_s: 1.5, sd: 0.6}
+  slow: {share: 0.09, median_s: 180, sd: 0.9}
+  offline: {share: 0.01, median_s: 7200, sd: 0.8}   # app offline, card terminal batch
+  redelivery_rate: 0.025          # Kinesis/Lambda retries deliver a batch twice
+  redelivery_delay_s: [5, 120]
+
+decisions:
+  per_customer_per_day: 1.2
+  resubmit_share: 0.15            # double submits and client retries
+  resubmit_extra: [1, 3]
+  resubmit_within_s: 2.5        # double clicks and client retries
+  open_banking_share: 0.3
+  burst_decision_lag_s: [10, 300] # a burst ends shortly before a decision
+
+providers:
+  bureau:        {cost_eur: 0.90, latency_median_ms: 350, latency_sd: 0.55, error_rate: 0.010, per: person, change_every_days: 20}
+  kyb_registry:  {cost_eur: 0.40, latency_median_ms: 450, latency_sd: 0.45, error_rate: 0.020, per: person, change_every_days: 60, only_business: true}
+  sanctions:     {cost_eur: 0.05, latency_median_ms: 120, latency_sd: 0.40, error_rate: 0.005, per: person, publish_hour: 6, change_per_publish: 0.002}
+  device_risk:   {cost_eur: 0.02, latency_median_ms: 80,  latency_sd: 0.35, error_rate: 0.005, per: decision}
+  open_banking:  {cost_eur: 0.25, latency_median_ms: 500, latency_sd: 0.38, error_rate: 0.030, per: person, change_every_days: 1}
+
+outages:                          # every call in the window hangs until the caller gives up
+  - {provider: open_banking, day: 9, start_hour: 14, hours: 2}
+  - {provider: bureau, day: 4, start_hour: 10, hours: 1}
+
+infrastructure:                   # how AWS behaves: latencies in ms, lognormal
+  redis: {median_ms: 0.7, sd: 0.35}
+  dynamodb: {median_ms: 5.5, sd: 0.35}
+  dynamodb_per_item_ms: 0.02
+  aurora: {median_ms: 4.0, sd: 0.4}
+  aurora_per_row_ms: 0.012
+  warm_containers: 24
+  container_life_minutes: [120, 480]
+  cold_start_ms: [200, 600]

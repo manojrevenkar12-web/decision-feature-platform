@@ -1,0 +1,15 @@
+# Feature definitions, as a lender would register them. Windows are minute-aligned: a window of w
+# minutes at decision time t covers event minutes (minute(t) - w, minute(t)] and only events that
+# had arrived by t.
+stream:
+  txn_count_10m:          {agg: count,         window_minutes: 10}
+  txn_count_1h:           {agg: count,         window_minutes: 60}
+  declined_ratio_1h:      {agg: declined_ratio, window_minutes: 60}
+  txn_sum_24h:            {agg: sum,           window_minutes: 1440}
+  distinct_merchants_7d:  {agg: distinct,      window_minutes: 10080}
+provider:
+  bureau_score:      {provider: bureau}
+  kyb_status:        {provider: kyb_registry, only_business: true}
+  sanctions_hit:     {provider: sanctions}
+  device_risk_score: {provider: device_risk}
+  ob_cashflow_30d:   {provider: open_banking, optional_share: true}

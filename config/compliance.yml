@@ -1,0 +1,9 @@
+# The lenders' rules for reusing paid data. The evaluator grades every design against these;
+# the platform design implements them. A rule here is a contract or a regulator's requirement.
+providers:
+  bureau:       {max_age_hours: 168, stale_if_error_hours: 24}   # report may be reused for 7 days
+  kyb_registry: {max_age_hours: 720, stale_if_error_hours: 168}
+  sanctions:    {max_age_hours: 24, not_before_daily_hour: 6}   # never older than the last list publication
+  device_risk:  {max_age_hours: 0}                              # one session, one check
+  open_banking: {max_age_hours: 1}
+cross_tenant_reuse: false        # a report bought by one lender is never served to another

@@ -1,0 +1,9 @@
+# Set from development seeds (1, 2, 3) before the held-out run. Never loosened after it.
+platform:
+  stream_exact_min: 0.999          # every stream feature equals the value knowable at the gate
+  policy_violations_max: 0         # no report served older than the lender's rule allows
+  cross_tenant_reuse_max: 0        # no lender is served a report another lender paid for
+  p99_ms_max: 1500                 # the decision flow's feature budget
+  spend_cut_vs_direct_low_min: 0.60  # lower end of the 95% interval, against querying every time
+  failed_rate_max: 0.015           # decisions referred because a feature was missing or late
+  fails_less_than_direct: true

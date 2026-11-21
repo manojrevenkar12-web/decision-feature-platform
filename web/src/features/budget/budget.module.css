@@ -1,0 +1,137 @@
+.figure {
+  margin: 0;
+  display: grid;
+  gap: var(--space-5);
+}
+
+.scale {
+  position: relative;
+  height: var(--space-5);
+  margin-left: calc(var(--label-col) + var(--space-4));
+  margin-right: calc(var(--value-col) + var(--space-4));
+  font-size: var(--size-0);
+  color: var(--ink-muted);
+}
+
+.scale span {
+  position: absolute;
+  bottom: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.scale span:first-child {
+  transform: none;
+}
+
+.scale .budget {
+  color: var(--ink);
+  font-weight: var(--weight-medium);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: var(--label-col) 1fr var(--value-col);
+  grid-template-areas:
+    "name track spend"
+    ". values spend";
+  column-gap: var(--space-4);
+  row-gap: var(--space-2);
+  align-items: center;
+}
+
+.name {
+  grid-area: name;
+  font-weight: var(--weight-medium);
+}
+
+.track {
+  grid-area: track;
+  position: relative;
+  height: var(--track-h);
+  background: var(--track);
+  border-radius: var(--radius);
+}
+
+.segment {
+  position: absolute;
+  inset: 0 auto 0 0;
+  transform-origin: left center;
+  border-radius: var(--radius);
+  background: var(--rule-strong);
+}
+
+.segment[data-tone="p95"] {
+  background: #8d99a5;
+}
+
+.segment[data-tone="p50"] {
+  background: var(--ink-muted);
+}
+
+.row[data-design="platform"] .segment[data-tone="p99"] {
+  background: #b4d0f2;
+}
+
+.row[data-design="platform"] .segment[data-tone="p95"] {
+  background: #74a7e6;
+}
+
+.row[data-design="platform"] .segment[data-tone="p50"] {
+  background: var(--platform);
+}
+
+.budgetLine {
+  position: absolute;
+  top: calc(var(--space-2) * -1);
+  bottom: calc(var(--space-2) * -1);
+  width: 2px;
+  background: var(--ink);
+}
+
+.values {
+  grid-area: values;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  font-size: var(--size-0);
+  color: var(--ink-muted);
+}
+
+.values strong {
+  color: var(--ink);
+  font-weight: var(--weight-bold);
+}
+
+.spend {
+  grid-area: spend;
+  display: grid;
+  justify-items: end;
+  text-align: right;
+}
+
+.spend strong {
+  font-size: var(--size-3);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+}
+
+.spend span {
+  font-size: var(--size-0);
+  color: var(--ink-muted);
+}
+
+@media (max-width: 760px) {
+  .row {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "name spend"
+      "track track"
+      "values values";
+  }
+
+  .scale {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}

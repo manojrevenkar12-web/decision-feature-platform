@@ -1,0 +1,663 @@
+{
+ "set": "dev",
+ "seeds": [
+  1,
+  2,
+  3
+ ],
+ "config_sha": "bf97adb678e41f2b",
+ "generated_at": "2026-11-21T18:06:21Z",
+ "facts": {
+  "events": 1016901,
+  "deliveries": 1042112,
+  "redelivered": 25211,
+  "late_over_1m": 91399,
+  "decisions": 196728,
+  "customers": 9000,
+  "people_at_two_lenders": 895
+ },
+ "designs": {
+  "direct": {
+   "label": "Query the source every time (status quo)",
+   "decisions": 196728,
+   "p50_ms": [
+    481.4516120482222,
+    480.1537184343042,
+    482.91934096116887
+   ],
+   "p95_ms": [
+    1084.333518964955,
+    1068.1946234500404,
+    1104.67742557628
+   ],
+   "p99_ms": [
+    1452.0,
+    1452.0,
+    1452.0
+   ],
+   "spend_per_1k_eur": [
+    1177.4445935504862,
+    1174.9954560827289,
+    1180.2830056341095
+   ],
+   "spend_cut_vs_direct": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "failed_rate": [
+    0.023748525883453296,
+    0.02030718268643147,
+    0.027568496532458138
+   ],
+   "failed_missing_rate": [
+    0.022991134968077753,
+    0.01964676620871856,
+    0.026826951626252343
+   ],
+   "exact_rate": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "cold_rate": [
+    0.024516083119840593,
+    0.024110846586253152,
+    0.024818811075724676
+   ],
+   "wrong_reports": 0,
+   "wrong_reports_rate": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "violations": 0,
+   "violations_rate": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "cross_tenant": 0,
+   "cross_tenant_rate": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "calls_per_decision": 3.6493635883046642,
+   "by_feature_exact": {
+    "txn_count_10m": 1.0,
+    "txn_count_1h": 1.0,
+    "declined_ratio_1h": 1.0,
+    "txn_sum_24h": 1.0,
+    "distinct_merchants_7d": 1.0
+   },
+   "by_provider": {
+    "bureau": {
+     "needed": 196728,
+     "missing": 2275,
+     "wrong": 0,
+     "violations": 0,
+     "changed_within_rule": 0
+    },
+    "kyb_registry": {
+     "needed": 57478,
+     "missing": 912,
+     "wrong": 0,
+     "violations": 0,
+     "changed_within_rule": 0
+    },
+    "sanctions": {
+     "needed": 196728,
+     "missing": 7,
+     "wrong": 0,
+     "violations": 0,
+     "changed_within_rule": 0
+    },
+    "device_risk": {
+     "needed": 196728,
+     "missing": 2,
+     "wrong": 0,
+     "violations": 0,
+     "changed_within_rule": 0
+    },
+    "open_banking": {
+     "needed": 58724,
+     "missing": 1361,
+     "wrong": 0,
+     "violations": 0,
+     "changed_within_rule": 0
+    }
+   },
+   "sources": {
+    "missing": 0.006451147106539484,
+    "provider": 0.9935488528934605,
+    "l1": 0.0,
+    "redis": 0.0,
+    "dynamodb": 0.0,
+    "coalesced": 0.0,
+    "stale_if_error": 0.0
+   },
+   "stream_consumer": {
+    "applied": 0,
+    "duplicates": 0,
+    "too_late": 0,
+    "redis_evictions": 0
+   }
+  },
+  "ttl_cache": {
+   "label": "One Redis cache, 24 h TTL for every provider",
+   "decisions": 196728,
+   "p50_ms": [
+    254.07831429893645,
+    249.51469748337567,
+    260.61693730672977
+   ],
+   "p95_ms": [
+    934.2186543846989,
+    923.6475431086054,
+    947.1016812487086
+   ],
+   "p99_ms": [
+    1452.0,
+    1452.0,
+    1452.0
+   ],
+   "spend_per_1k_eur": [
+    578.4785083973811,
+    573.0200799611343,
+    585.1357413276047
+   ],
+   "spend_cut_vs_direct": [
+    0.508700017337523,
+    0.5027772823003632,
+    0.5130665303752856
+   ],
+   "failed_rate": [
+    0.01360762067423041,
+    0.011008938348891564,
+    0.016390753010007246
+   ],
+   "failed_missing_rate": [
+    0.013246716278313204,
+    0.01068112329135378,
+    0.016085805551993
+   ],
+   "exact_rate": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "cold_rate": [
+    0.024516083119840593,
+    0.024110846586253152,
+    0.024818811075724676
+   ],
+   "wrong_reports": 3667,
+   "wrong_reports_rate": [
+    0.005210546134007801,
+    0.004936463334629745,
+    0.0054727396362751505
+   ],
+   "violations": 35675,
+   "violations_rate": [
+    0.05069163712318743,
+    0.04852378765348149,
+    0.05222615541371019
+   ],
+   "cross_tenant": 29770,
+   "cross_tenant_rate": [
+    0.042301052197821716,
+    0.04088799271656296,
+    0.043598830784819055
+   ],
+   "calls_per_decision": 2.307653206457647,
+   "by_feature_exact": {
+    "txn_count_10m": 1.0,
+    "txn_count_1h": 1.0,
+    "declined_ratio_1h": 1.0,
+    "txn_sum_24h": 1.0,
+    "distinct_merchants_7d": 1.0
+   },
+   "by_provider": {
+    "bureau": {
+     "needed": 196728,
+     "missing": 1106,
+     "wrong": 1203,
+     "violations": 0,
+     "changed_within_rule": 1203
+    },
+    "kyb_registry": {
+     "needed": 57478,
+     "missing": 433,
+     "wrong": 147,
+     "violations": 0,
+     "changed_within_rule": 147
+    },
+    "sanctions": {
+     "needed": 196728,
+     "missing": 3,
+     "wrong": 67,
+     "violations": 26089,
+     "changed_within_rule": 0
+    },
+    "device_risk": {
+     "needed": 196728,
+     "missing": 2,
+     "wrong": 0,
+     "violations": 0,
+     "changed_within_rule": 0
+    },
+    "open_banking": {
+     "needed": 58724,
+     "missing": 1077,
+     "wrong": 2250,
+     "violations": 9586,
+     "changed_within_rule": 30
+    }
+   },
+   "sources": {
+    "missing": 0.0037104359372920753,
+    "provider": 0.6293740249665197,
+    "l1": 0.0,
+    "redis": 0.3669155390961882,
+    "dynamodb": 0.0,
+    "coalesced": 0.0,
+    "stale_if_error": 0.0
+   },
+   "stream_consumer": {
+    "applied": 0,
+    "duplicates": 0,
+    "too_late": 0,
+    "redis_evictions": 418557
+   }
+  },
+  "streaming_naive": {
+   "label": "Stream counters by arrival time, no dedupe, one TTL",
+   "decisions": 196728,
+   "p50_ms": [
+    254.07831429893645,
+    249.51469748337567,
+    260.61693730672977
+   ],
+   "p95_ms": [
+    934.2186543846989,
+    923.6475431086054,
+    947.1016812487086
+   ],
+   "p99_ms": [
+    1452.0,
+    1452.0,
+    1452.0
+   ],
+   "spend_per_1k_eur": [
+    578.4785083973811,
+    573.0200799611343,
+    585.1357413276047
+   ],
+   "spend_cut_vs_direct": [
+    0.508700017337523,
+    0.5027772823003632,
+    0.5130665303752856
+   ],
+   "failed_rate": [
+    0.01360762067423041,
+    0.011008938348891564,
+    0.016390753010007246
+   ],
+   "failed_missing_rate": [
+    0.013246716278313204,
+    0.01068112329135378,
+    0.016085805551993
+   ],
+   "exact_rate": [
+    0.8258915863527306,
+    0.8194560105551331,
+    0.834228142711883
+   ],
+   "cold_rate": [
+    0.024516083119840593,
+    0.024110846586253152,
+    0.024818811075724676
+   ],
+   "wrong_reports": 3667,
+   "wrong_reports_rate": [
+    0.005210546134007801,
+    0.004936463334629745,
+    0.0054727396362751505
+   ],
+   "violations": 35675,
+   "violations_rate": [
+    0.05069163712318743,
+    0.04852378765348149,
+    0.05222615541371019
+   ],
+   "cross_tenant": 29770,
+   "cross_tenant_rate": [
+    0.042301052197821716,
+    0.04088799271656296,
+    0.043598830784819055
+   ],
+   "calls_per_decision": 2.307653206457647,
+   "by_feature_exact": {
+    "txn_count_10m": 0.9920906022528567,
+    "txn_count_1h": 0.9817717864259282,
+    "declined_ratio_1h": 0.9966908625106746,
+    "txn_sum_24h": 0.8335264934325566,
+    "distinct_merchants_7d": 0.999181611158554
+   },
+   "by_provider": {
+    "bureau": {
+     "needed": 196728,
+     "missing": 1106,
+     "wrong": 1203,
+     "violations": 0,
+     "changed_within_rule": 1203
+    },
+    "kyb_registry": {
+     "needed": 57478,
+     "missing": 433,
+     "wrong": 147,
+     "violations": 0,
+     "changed_within_rule": 147
+    },
+    "sanctions": {
+     "needed": 196728,
+     "missing": 3,
+     "wrong": 67,
+     "violations": 26089,
+     "changed_within_rule": 0
+    },
+    "device_risk": {
+     "needed": 196728,
+     "missing": 2,
+     "wrong": 0,
+     "violations": 0,
+     "changed_within_rule": 0
+    },
+    "open_banking": {
+     "needed": 58724,
+     "missing": 1077,
+     "wrong": 2250,
+     "violations": 9586,
+     "changed_within_rule": 30
+    }
+   },
+   "sources": {
+    "missing": 0.0037104359372920753,
+    "provider": 0.6293740249665197,
+    "l1": 0.0,
+    "redis": 0.3669155390961882,
+    "dynamodb": 0.0,
+    "coalesced": 0.0,
+    "stale_if_error": 0.0
+   },
+   "stream_consumer": {
+    "applied": 1041960,
+    "duplicates": 0,
+    "too_late": 0,
+    "redis_evictions": 418557
+   }
+  },
+  "platform": {
+   "label": "This platform",
+   "decisions": 196728,
+   "p50_ms": [
+    136.54845898207043,
+    132.6817785861418,
+    142.87147138939872
+   ],
+   "p95_ms": [
+    799.4293097201493,
+    779.8733695238692,
+    822.3670071422465
+   ],
+   "p99_ms": [
+    1181.4047224478402,
+    1136.5322863879314,
+    1207.8551546002461
+   ],
+   "spend_per_1k_eur": [
+    197.87432393965273,
+    162.02103913324189,
+    241.07569818039835
+   ],
+   "spend_cut_vs_direct": [
+    0.8319459573524567,
+    0.7953155628169457,
+    0.8623149160535598
+   ],
+   "failed_rate": [
+    0.007792485055508113,
+    0.005034531601804879,
+    0.010768320358945342
+   ],
+   "failed_missing_rate": [
+    0.007568825993249563,
+    0.004786118869914265,
+    0.010557076095271662
+   ],
+   "exact_rate": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "cold_rate": [
+    0.024516083119840593,
+    0.024110846586253152,
+    0.024818811075724676
+   ],
+   "wrong_reports": 30376,
+   "wrong_reports_rate": [
+    0.043093187457351564,
+    0.035745450522143264,
+    0.04902163853321362
+   ],
+   "violations": 0,
+   "violations_rate": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "cross_tenant": 0,
+   "cross_tenant_rate": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "calls_per_decision": 1.8390722215444675,
+   "by_feature_exact": {
+    "txn_count_10m": 1.0,
+    "txn_count_1h": 1.0,
+    "declined_ratio_1h": 1.0,
+    "txn_sum_24h": 1.0,
+    "distinct_merchants_7d": 1.0
+   },
+   "by_provider": {
+    "bureau": {
+     "needed": 196728,
+     "missing": 123,
+     "wrong": 24567,
+     "violations": 0,
+     "changed_within_rule": 24567
+    },
+    "kyb_registry": {
+     "needed": 57478,
+     "missing": 57,
+     "wrong": 5777,
+     "violations": 0,
+     "changed_within_rule": 5777
+    },
+    "sanctions": {
+     "needed": 196728,
+     "missing": 4,
+     "wrong": 0,
+     "violations": 0,
+     "changed_within_rule": 0
+    },
+    "device_risk": {
+     "needed": 196728,
+     "missing": 2,
+     "wrong": 0,
+     "violations": 0,
+     "changed_within_rule": 0
+    },
+    "open_banking": {
+     "needed": 58724,
+     "missing": 1309,
+     "wrong": 32,
+     "violations": 0,
+     "changed_within_rule": 32
+    }
+   },
+   "sources": {
+    "missing": 0.0021164066105500393,
+    "provider": 0.5048769369721371,
+    "l1": 0.010345618401270693,
+    "redis": 0.389028095120798,
+    "dynamodb": 0.08820106853759842,
+    "coalesced": 0.0053398566789262525,
+    "stale_if_error": 9.201767871956693e-05
+   },
+   "stream_consumer": {
+    "applied": 1016753,
+    "duplicates": 25207,
+    "too_late": 0,
+    "redis_evictions": 163181
+   }
+  },
+  "no_dedupe": {
+   "label": "Platform without event dedupe",
+   "decisions": 196728,
+   "p50_ms": [
+    136.54845898207043,
+    132.6817785861418,
+    142.87147138939872
+   ],
+   "p95_ms": [
+    799.4293097201493,
+    779.8733695238692,
+    822.3670071422465
+   ],
+   "p99_ms": [
+    1181.4047224478402,
+    1136.5322863879314,
+    1207.8551546002461
+   ],
+   "spend_per_1k_eur": [
+    197.87432393965273,
+    162.02103913324189,
+    241.07569818039835
+   ],
+   "spend_cut_vs_direct": [
+    0.8319459573524567,
+    0.7953155628169457,
+    0.8623149160535598
+   ],
+   "failed_rate": [
+    0.007792485055508113,
+    0.005034531601804879,
+    0.010768320358945342
+   ],
+   "failed_missing_rate": [
+    0.007568825993249563,
+    0.004786118869914265,
+    0.010557076095271662
+   ],
+   "exact_rate": [
+    0.8425287706884632,
+    0.8365433047597814,
+    0.8502955747798843
+   ],
+   "cold_rate": [
+    0.024516083119840593,
+    0.024110846586253152,
+    0.024818811075724676
+   ],
+   "wrong_reports": 30376,
+   "wrong_reports_rate": [
+    0.043093187457351564,
+    0.035745450522143264,
+    0.04902163853321362
+   ],
+   "violations": 0,
+   "violations_rate": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "cross_tenant": 0,
+   "cross_tenant_rate": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "calls_per_decision": 1.8390722215444675,
+   "by_feature_exact": {
+    "txn_count_10m": 0.9973211744134033,
+    "txn_count_1h": 0.9881257370582733,
+    "declined_ratio_1h": 0.9972754259688504,
+    "txn_sum_24h": 0.8425287706884632,
+    "distinct_merchants_7d": 1.0
+   },
+   "by_provider": {
+    "bureau": {
+     "needed": 196728,
+     "missing": 123,
+     "wrong": 24567,
+     "violations": 0,
+     "changed_within_rule": 24567
+    },
+    "kyb_registry": {
+     "needed": 57478,
+     "missing": 57,
+     "wrong": 5777,
+     "violations": 0,
+     "changed_within_rule": 5777
+    },
+    "sanctions": {
+     "needed": 196728,
+     "missing": 4,
+     "wrong": 0,
+     "violations": 0,
+     "changed_within_rule": 0
+    },
+    "device_risk": {
+     "needed": 196728,
+     "missing": 2,
+     "wrong": 0,
+     "violations": 0,
+     "changed_within_rule": 0
+    },
+    "open_banking": {
+     "needed": 58724,
+     "missing": 1309,
+     "wrong": 32,
+     "violations": 0,
+     "changed_within_rule": 32
+    }
+   },
+   "sources": {
+    "missing": 0.0021164066105500393,
+    "provider": 0.5048769369721371,
+    "l1": 0.010345618401270693,
+    "redis": 0.389028095120798,
+    "dynamodb": 0.08820106853759842,
+    "coalesced": 0.0053398566789262525,
+    "stale_if_error": 9.201767871956693e-05
+   },
+   "stream_consumer": {
+    "applied": 1041960,
+    "duplicates": 0,
+    "too_late": 0,
+    "redis_evictions": 163181
+   }
+  }
+ },
+ "backfill_skew": {
+  "txn_count_10m": 0.009069415888416891,
+  "txn_count_1h": 0.013140423113045493,
+  "declined_ratio_1h": 0.003299555737745992,
+  "txn_sum_24h": 0.01989547901811513,
+  "distinct_merchants_7d": 0.0032424215131846863
+ }
+}
